@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [{ "src": "frontend/**", "use": "@vercel/static" }],
   "routes": [
-    { "src": "/", "dest": "/frontend/index.html" },
+    { "src": "^/$", "dest": "/frontend/index.html" },
     { "src": "/(.*)", "dest": "/frontend/$1" }
   ]
 }
