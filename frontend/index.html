@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Breast Cancer Classifier</title>
+    <link rel="stylesheet" href="./styles/global.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <h1>Breast Cancer Classifier</h1>
+      <p>
+        Paste a JSON object mapping each feature to a numeric value, choose a
+        model, and send for prediction.
+      </p>
+
+      <div
+        class="row"
+        style="
+          display: flex;
+          align-items: flex-start;
+          gap: 16px;
+          justify-content: space-between;
+        "
+      >
+        <div>
+          <label for="featureJson">Feature JSON</label>
+          <textarea id="featureJson" spellcheck="false">
+{
+"mean radius": 14.5,
+"mean texture": 20.1,
+"mean perimeter": 96.5,
+"mean area": 655.0,
+"mean smoothness": 0.10,
+"mean compactness": 0.12,
+"mean concavity": 0.08,
+"mean concave points": 0.05,
+"mean symmetry": 0.18,
+"mean fractal dimension": 0.06,
+"radius error": 0.3,
+"texture error": 1.0,
+"perimeter error": 2.0,
+"area error": 30.0,
+"smoothness error": 0.006,
+"compactness error": 0.020,
+"concavity error": 0.020,
+"concave points error": 0.010,
+"symmetry error": 0.020,
+"fractal dimension error": 0.003,
+"worst radius": 16.0,
+"worst texture": 28.0,
+"worst perimeter": 110.0,
+"worst area": 800.0,
+"worst smoothness": 0.13,
+"worst compactness": 0.25,
+"worst concavity": 0.20,
+"worst concave points": 0.09,
+"worst symmetry": 0.30,
+"worst fractal dimension": 0.08
+}</textarea
+          >
+          <div class="hint">
+            Use backend URL like http://localhost:8000/predict
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-width: 260px;
+          "
+        >
+          <label for="model">Model</label>
+          <select id="model">
+            <option value="log_reg">Logistic Regression</option>
+            <option value="tree">Decision Tree</option>
+          </select>
+          <div style="height: 8px"></div>
+          <label for="endpoint">Backend URL</label>
+          <input
+            id="endpoint"
+            type="text"
+            value="http://localhost:8000/predict"
+            style="width: 240px"
+          />
+          <div style="height: 12px"></div>
+          <button id="send">Predict</button>
+        </div>
+      </div>
+
+      <label>Response</label>
+      <pre id="response">Waiting...</pre>
+    </div>
+
+    <script>
+      const button = document.getElementById("send");
+      const resp = document.getElementById("response");
+      button.addEventListener("click", async () => {
+        try {
+          const payload = JSON.parse(
+            document.getElementById("featureJson").value
+          );
+          const model = document.getElementById("model").value;
+          const endpoint = document.getElementById("endpoint").value.trim();
+          resp.textContent = "Sending...";
+          const res = await fetch(endpoint + `?model=${model}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ features: payload }),
+          });
+          const json = await res.json();
+          resp.textContent = JSON.stringify(json, null, 2);
+        } catch (err) {
+          resp.textContent = "Error: " + err;
+        }
+      });
+    </script>
+  </body>
+</html>
